@@ -1,0 +1,10 @@
+{
+  "extends": "loopback",
+  "parserOptions": { "ecmaVersion": 8 },
+  "rules": {
+    "comma-dangle": ["error", "never"],
+    "max-len": ["error", 120],
+    "camelcase": 0,
+    "no-unused-expressions": [2, { "allowTernary": true }]
+  }
+}

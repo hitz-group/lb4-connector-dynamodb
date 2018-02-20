@@ -11,11 +11,11 @@ permalink: /doc/en/community/dynamo-connector.html
 
 ## Link
 
-[https://github.com/mandarzope/loopback-connector-dynamodb](https://github.com/mandarzope/loopback-connector-dynamodb)
+[https://github.com/ggcasuso/loopback-connector-dynamodb](https://github.com/ggcasuso/loopback-connector-dynamodb)
 
 ## Overview
 
-DynamoDB Connector for loopback (compitable with datasource-juggler) 
+DynamoDB Connector for loopback (compitable with datasource-juggler) forked from [this repository](https://github.com/mandarzope/loopback-connector-dynamodb)
 
 ## Features
 
