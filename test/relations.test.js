@@ -22,10 +22,18 @@ describe('relations', function() {
       db.adapter.client.deleteTable({ TableName: 'Chapter' }, function() {
         db.adapter.client.deleteTable({ TableName: 'Author' }, function() {
           db.adapter.client.deleteTable({ TableName: 'Reader' }, function() {
-            db.adapter.client.deleteTable({ TableName: 'Article' }, function() {
-              db.adapter.client.deleteTable({ TableName: 'Tag' }, function() {
-                db.adapter.client.deleteTable({ TableName: 'ArticleTag' }, function() {
-                  done();
+            db.adapter.client.deleteTable({ TableName: 'List' }, function() {
+              db.adapter.client.deleteTable({ TableName: 'Item' }, function() {
+                db.adapter.client.deleteTable({ TableName: 'Fear' }, function() {
+                  db.adapter.client.deleteTable({ TableName: 'Mind' }, function() {
+                    db.adapter.client.deleteTable({ TableName: 'Article' }, function() {
+                      db.adapter.client.deleteTable({ TableName: 'Tag' }, function() {
+                        db.adapter.client.deleteTable({ TableName: 'ArticleTag' }, function() {
+                          done();
+                        });
+                      });
+                    });
+                  });
                 });
               });
             });
