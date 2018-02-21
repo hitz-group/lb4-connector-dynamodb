@@ -6,7 +6,7 @@
   "scripts": {
     "test": "make test",
     "tdd": "NODE_ENV=test mocha -w --recursive",
-    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha -- --ui bdd -R spec -t 5000"
+    "coverage": "NODE_ENV=test nyc mocha --recursive --exit"
   },
   "dependencies": {
     "async": "latest",
@@ -19,7 +19,12 @@
   "devDependencies": {
     "jugglingdb": ">= 0.1.0",
     "mocha": "latest",
+    "nyc": "^11.4.1",
     "should": "latest"
+  },
+  "nyc": {
+    "exclude": ["server/boot", "coverage", "test"],
+    "reporter": ["lcov", "text-summary"]
   },
   "repository": "https://github.com/ggcasuso/loopback-connector-dynamodb.git",
   "author": {

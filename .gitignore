@@ -17,4 +17,4 @@ log/*.log
 coverage.html
 .settings
 doc
-
+.nyc_output
