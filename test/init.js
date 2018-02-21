@@ -12,5 +12,7 @@ global.getSchema = function() {
     console.log(a);
   };
 
+  // db.tablePrefix = 'test_';
+
   return db;
 };

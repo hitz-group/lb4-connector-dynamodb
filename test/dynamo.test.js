@@ -12,24 +12,26 @@ describe('dynamodb', function() {
       age: { type: Number }
     });
 
-    db.adapter.emitter.on('created', function(event) {
-      if (event.tableParams.TableName === 'User') {
-        Film = db.define('Film', {
-          title: { type: String },
-          year: { type: Number }
-        });
-      } else if (event.tableParams.TableName === 'Film') {
-        Book = db.define('Book', {
-          title: { type: String },
-          iban: { type: String, keyType: 'hash' }
-        });
-      } else if (event.tableParams.TableName === 'Book') {
-        Song = db.define('Song', {
-          id: { type: String, keyType: 'pk', separator: '--oo--' },
-          singer: { type: String, keyType: 'hash' },
-          title: { type: String, keyType: 'range' }
-        });
-      } else {
+    Film = db.define('Film', {
+      title: { type: String },
+      year: { type: Number }
+    });
+
+    Book = db.define('Book', {
+      title: { type: String },
+      iban: { type: String, keyType: 'hash' }
+    });
+
+    Song = db.define('Song', {
+      id: { type: String, keyType: 'pk', separator: '--oo--' },
+      singer: { type: String, keyType: 'hash' },
+      title: { type: String, keyType: 'range' }
+    });
+
+    let modelCreated = 0;
+    db.adapter.emitter.on('created', function() {
+      modelCreated++;
+      if (modelCreated === 4) {
         done();
       }
     });

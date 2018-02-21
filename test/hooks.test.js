@@ -10,10 +10,12 @@ describe('hooks', function() {
       state: String
     });
 
-    db.adapter.emitter.on('created', function(event) {
-      if (event.tableParams.TableName === 'User') {
-        FooModel = db.define('FooModel');
-      } else {
+    FooModel = db.define('FooModel');
+
+    let modelCreated = 0;
+    db.adapter.emitter.on('created', function() {
+      modelCreated++;
+      if (modelCreated === 2) {
         done();
       }
     });

@@ -11,7 +11,7 @@ describe('datatypes', function() {
     });
 
     db.adapter.emitter.on('created', function() {
-      Model.destroyAll(done);
+      done();
     });
   });
 
