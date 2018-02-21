@@ -15,9 +15,14 @@ describe('datatypes', function() {
     });
   });
 
+  after(function(done) {
+    db.adapter.client.deleteTable({ TableName: 'Model' }, function() {
+      done();
+    });
+  });
+
   it('should keep types when get read data from db', function(done) {
     const date = new Date();
-    console.log(date.toISOString());
     Model.create(
       {
         str: 'hello',
