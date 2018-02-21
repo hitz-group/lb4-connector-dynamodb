@@ -1,4 +1,4 @@
-var should = require('./init.js');
+const should = require('./init.js');
 
 describe('hooks', function() {
   before(function(done) {
@@ -55,7 +55,6 @@ describe('hooks', function() {
     });
 
     it('should be triggered on create', function(done) {
-      var user;
       User.afterInitialize = function() {
         if (this.name === 'Nickolay') {
           this.name += ' Rozental';

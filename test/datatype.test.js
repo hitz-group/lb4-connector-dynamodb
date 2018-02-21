@@ -1,4 +1,4 @@
-var should = require('./init.js');
+const should = require('./init.js');
 
 describe('datatypes', function() {
   before(function(done) {
@@ -67,7 +67,7 @@ describe('datatypes', function() {
   });
 
   it('should convert "false" to false for boolean', function() {
-    var m = new Model({ bool: 'false' });
-    m.bool.should.equal(false);
+    const model = new Model({ bool: 'false' });
+    model.bool.should.equal(false);
   });
 });

@@ -1,6 +1,4 @@
-var should = require('./init.js');
-
-var db, User, Book, Cookie, Car;
+const should = require('./init.js');
 
 describe('dynamodb', function() {
   before(function(done) {
@@ -98,7 +96,7 @@ describe('dynamodb', function() {
     });
 
     it('should use separator specified in schema definition', function(done) {
-      var song = new Song({
+      const song = new Song({
         singer: 'Foo Fighters',
         title: 'The Pretender'
       });
@@ -117,12 +115,12 @@ describe('dynamodb', function() {
     });
 
     it('should create two items for same hash but different ranges', function(done) {
-      var song1 = new Song({
+      const song1 = new Song({
         title: 'The Pretender',
         singer: 'Foo Fighters'
       });
 
-      var song2 = new Song({
+      const song2 = new Song({
         title: 'All my life',
         singer: 'Foo Fighters'
       });

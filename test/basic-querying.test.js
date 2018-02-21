@@ -1,4 +1,4 @@
-var should = require('./init.js');
+const should = require('./init.js');
 
 describe('basic-querying', function() {
   before(function(done) {
@@ -80,7 +80,7 @@ describe('basic-querying', function() {
     });
 
     it('should replace original record if same hash key is provided', function(done) {
-      var tempUser = new User({
+      const tempUser = new User({
         id: '1',
         name: 'Johnny Doey',
         email: 'johnny@doey.com'
@@ -95,7 +95,7 @@ describe('basic-querying', function() {
     });
 
     it('should handle undefined and null attributes and return the same from database', function(done) {
-      var tempUser = new User({
+      const tempUser = new User({
         id: '2',
         name: 'Anne',
         email: null
@@ -110,7 +110,7 @@ describe('basic-querying', function() {
     });
 
     it('should return error saying hash key cannot be null', function(done) {
-      var tempUser = new User({
+      const tempUser = new User({
         id: null
       });
       User.create(tempUser, function(err, user) {

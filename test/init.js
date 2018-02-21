@@ -1,9 +1,9 @@
 module.exports = require('should');
 
-var Schema = require('jugglingdb').Schema;
+const Schema = require('jugglingdb').Schema;
 
 global.getSchema = function() {
-  var db = new Schema(require('../'), {
+  const db = new Schema(require('../'), {
     host: 'localhost',
     port: '8000',
     logLevel: 'info'
@@ -11,8 +11,6 @@ global.getSchema = function() {
   db.log = function(a) {
     console.log(a);
   };
-
-  // db.tablePrefix = 'test_';
 
   return db;
 };

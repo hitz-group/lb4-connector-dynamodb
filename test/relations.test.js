@@ -1,4 +1,4 @@
-var should = require('./init.js');
+const should = require('./init.js');
 
 describe('relations', function() {
   before(function(done) {
@@ -7,7 +7,7 @@ describe('relations', function() {
     Chapter = db.define('Chapter', { name: { type: String, index: true, limit: 20 } });
     Author = db.define('Author', { name: String });
     Reader = db.define('Reader', { name: String });
-    var modelCount = 0;
+    let modelCount = 0;
 
     db.adapter.emitter.on('created', function() {
       modelCount++;
@@ -215,7 +215,7 @@ describe('relations', function() {
 
   describe('hasAndBelongsToMany', function() {
     before(function(done) {
-      var modelCount = 0;
+      let modelCount = 0;
       Article = db.define('Article', { title: String });
       Tag = db.define('Tag', { name: String });
 
