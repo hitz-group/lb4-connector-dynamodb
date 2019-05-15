@@ -14,7 +14,7 @@
     "colors": "latest",
     "loopback-connector": "^4.4.0",
     "strong-globalize": "^2.10.0",
-    "winston": ">=0.7.3"
+    "winston": "^2.4.4"
   },
   "devDependencies": {
     "jugglingdb": ">= 0.1.0",
