@@ -1,12 +1,12 @@
 {
   "name": "lb4-connector-dynamodb",
   "description": "DynamoDB connector for LoopBack 4",
-  "version": "0.2.5-1",
+  "version": "0.2.5-2",
   "main": "index.js",
   "scripts": {
     "test": "make test",
-    "tdd": "NODE_ENV=test mocha -w --recursive",
-    "coverage": "NODE_ENV=test nyc mocha --recursive --exit"
+    "tdd": "env NODE_ENV=test mocha -w --recursive",
+    "coverage": "env NODE_ENV=test nyc mocha --recursive --exit"
   },
   "dependencies": {
     "async": "latest",
