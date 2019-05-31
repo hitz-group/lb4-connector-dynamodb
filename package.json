@@ -4,7 +4,7 @@
   "version": "0.2.5-2",
   "main": "index.js",
   "scripts": {
-    "test": "make test",
+    "test": "env NODE_ENV=test mocha --color test/*.test.js --timeout 5000 --reporter spec",
     "tdd": "env NODE_ENV=test mocha -w --recursive",
     "coverage": "env NODE_ENV=test nyc mocha --recursive --exit"
   },
@@ -23,13 +23,32 @@
     "should": "latest"
   },
   "nyc": {
-    "exclude": ["server/boot", "coverage", "test"],
-    "reporter": ["lcov", "text-summary"]
+    "exclude": [
+      "server/boot",
+      "coverage",
+      "test"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ]
   },
   "repository": "https://github.com/sam016/loopback-connector-dynamodb.git",
   "author": {
     "name": "sam016",
     "email": "devmaster@sam016.com"
   },
+  "contributors": [
+    {
+      "name": "tmpaul"
+    },
+    {
+      "name": "ggcasuso"
+    },
+    {
+      "name": "sam016",
+      "email": "devmaster@sam016.com"
+    }
+  ],
   "license": "MIT"
 }
