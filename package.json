@@ -1,7 +1,7 @@
 {
   "name": "lb4-connector-dynamodb",
   "description": "DynamoDB connector for LoopBack 4",
-  "version": "0.2.6-1",
+  "version": "0.2.6-2",
   "main": "index.js",
   "scripts": {
     "test": "env NODE_ENV=test mocha --color test/*.test.js --timeout 5000 --reporter spec",
