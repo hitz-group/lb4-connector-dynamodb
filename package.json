@@ -5,16 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "env NODE_ENV=test mocha --color test/*.test.js --timeout 5000 --reporter spec",
-    "tdd": "env NODE_ENV=test mocha -w --recursive",
+    "tdd": "env NODE_ENV=test mocha --color -w --recursive",
     "coverage": "env NODE_ENV=test nyc mocha --recursive --exit"
   },
   "dependencies": {
     "async": "latest",
     "aws-sdk": "latest",
     "colors": "latest",
-    "loopback-connector": "^4.4.0",
-    "strong-globalize": "^2.10.0",
-    "winston": "^2.4.4"
+    "loopback-connector": "^4.7.0",
+    "strong-globalize": "^5.0.0",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "jugglingdb": ">= 0.1.0",
