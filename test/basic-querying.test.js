@@ -1,44 +1,86 @@
-const should = require('./init.js');
+/* eslint-disable no-unused-expressions */
+const should = require('should');
+const { getSchema, closeDynaliteServer } = require('./init.js');
 
 describe('basic-querying', () => {
-  before((done) => {
-    db = getSchema();
+  let db;
+  let User;
+  let Film;
+  let Book;
 
-    User = db.define('User', {
-      id: { type: String, keyType: 'hash' },
-      name: { type: String, sort: true, limit: 100 },
-      email: { type: String, index: true, limit: 100 },
-      role: { type: String, index: true, limit: 100 },
-      order: {
-        type: Number,
-        index: true,
-        sort: true,
-        limit: 100,
-      },
-    });
+  before(async () => {
+    db = await getSchema();
 
-    Film = db.define('Film', {
-      title: { type: String },
-      year: { type: Number },
-    });
+    User = db.define('User',
+      {
+        id: {
+          type: String,
+          keyType: 'hash',
+        },
+        name: {
+          type: String,
+          sort: true,
+          limit: 100,
+        },
+        email: {
+          type: String,
+          index: true,
+          limit: 100,
+        },
+        role: {
+          type: String,
+          index: true,
+          limit: 100,
+        },
+        order: {
+          type: Number,
+          index: true,
+          sort: true,
+          limit: 100,
+        },
+      }, {
+        tableStatus: {
+          timeInterval: 50,
+        },
+      });
 
-    Book = db.define('Book', {
-      title: { type: String },
-      iban: { type: String, keyType: 'hash' },
-    });
+    Film = db.define('Film',
+      {
+        title: {
+          type: String,
+        },
+        year: {
+          type: Number,
+        },
+      }, {
+        tableStatus: {
+          timeInterval: 50,
+        },
+      });
 
-    Song = db.define('Song', {
-      id: { type: String, keyType: 'pk', separator: '--oo--' },
-      singer: { type: String, keyType: 'hash' },
-      title: { type: String, keyType: 'range' },
-    });
+    Book = db.define('Book',
+      {
+        title: {
+          type: String,
+        },
+        iban: {
+          type: String,
+          keyType: 'hash',
+        },
+      }, {
+        tableStatus: {
+          timeInterval: 50,
+        },
+      });
 
-    let modelCreated = 0;
-    db.adapter.emitter.on('created', () => {
-      modelCreated += 1;
-      if (modelCreated === 4) {
-        done();
-      }
+    return new Promise((resolve) => {
+      let modelCreated = 0;
+      db.adapter.emitter.on('created', () => {
+        modelCreated += 1;
+        if (modelCreated === 3) {
+          resolve();
+        }
+      });
     });
   });
 
@@ -46,21 +88,54 @@ describe('basic-querying', () => {
     db.adapter.client.deleteTable({ TableName: 'Film' }, () => {
       db.adapter.client.deleteTable({ TableName: 'User' }, () => {
         db.adapter.client.deleteTable({ TableName: 'Book' }, () => {
-          db.adapter.client.deleteTable({ TableName: 'Song' }, () => {
-            done();
-          });
+          closeDynaliteServer().then(done);
         });
       });
     });
   });
 
+  function seed(done) {
+    const beatles = [
+      {
+        id: '1',
+        name: 'John Lennon',
+        mail: 'john@b3atl3s.co.uk',
+        role: 'lead',
+        order: 2,
+      },
+      {
+        id: '2',
+        name: 'Paul McCartney',
+        mail: 'paul@b3atl3s.co.uk',
+        role: 'lead',
+        order: 1,
+      },
+      { id: '3', name: 'George Harrison', order: 5 },
+      { id: '4', name: 'Ringo Starr', order: 6 },
+      { id: '5', name: 'Pete Best', order: 4 },
+      { id: '6', name: 'Stuart Sutcliffe', order: 3 },
+    ];
+
+    let index = 0;
+    function insertUser() {
+      if (index >= beatles.length) {
+        done();
+        return;
+      }
+      User.create(beatles[index], insertUser);
+      index += 1;
+    }
+
+    User.destroyAll(insertUser);
+  }
+
   describe('create items', () => {
     it('should create a new item', (done) => {
-      User.create({ id: '1', name: 'Jonh', email: 'jonh@doe.foo' }, (err, user) => {
+      User.create({ id: '1', name: 'John', email: 'john@doe.foo' }, (err, user) => {
         should.not.exist(err);
         should.exist(user);
         user.should.have.property('id', '1');
-        user.should.have.property('name', 'Jonh');
+        user.should.have.property('name', 'John');
         done();
       });
     });
@@ -69,8 +144,8 @@ describe('basic-querying', () => {
       Film.create({ title: 'Star Wars', year: 1977 }, (err, cookie) => {
         should.not.exist(err);
         cookie.should.have.property('id');
-        db.adapter.allModels['Film'].hashKey.should.eql('id');
-        db.adapter.allModels['Film'].hashKeyUUID.should.be.true;
+        db.adapter.allModels.Film.hashKey.should.eql('id');
+        db.adapter.allModels.Film.hashKeyUUID.should.be.true;
         done();
       });
     });
@@ -105,7 +180,7 @@ describe('basic-querying', () => {
     });
 
     it('should return error saying hash key cannot be null', (done) => {
-      User.create({ id: null }, (err, user) => {
+      User.create({ id: null }, (err) => {
         should.exist(err);
         done();
       });
@@ -122,11 +197,11 @@ describe('basic-querying', () => {
     });
 
     it('should query by id: found', (done) => {
-      User.create({ id: '123' }, (err, user) => {
-        User.find(user.id, (err, user) => {
-          should.exist(user);
-          should.not.exist(err);
-          user.should.be.an.instanceOf(User);
+      User.create({ id: '123' }, (createError, createUser) => {
+        User.find(createUser.id, (foundError, foundUser) => {
+          should.exist(foundUser);
+          should.not.exist(foundError);
+          foundUser.should.be.an.instanceOf(User);
           done();
         });
       });
@@ -156,10 +231,13 @@ describe('basic-querying', () => {
 
     it('should query offset collection with limit', (done) => {
       User.all({ skip: 1, limit: 4 }, (err, users) => {
-        users[0].should.have.property('id', '2');
         should.exists(users);
         should.not.exists(err);
         users.should.have.lengthOf(4);
+
+        // fails in dynalite; since order of list items changes
+        users[0].should.have.property('id', '2');
+
         done();
       });
     });
@@ -279,39 +357,3 @@ describe('basic-querying', () => {
     });
   });
 });
-
-function seed(done) {
-  let count = 0;
-  const beatles = [
-    {
-      id: '1',
-      name: 'John Lennon',
-      mail: 'john@b3atl3s.co.uk',
-      role: 'lead',
-      order: 2
-    },
-    {
-      id: '2',
-      name: 'Paul McCartney',
-      mail: 'paul@b3atl3s.co.uk',
-      role: 'lead',
-      order: 1
-    },
-    { id: '3', name: 'George Harrison', order: 5 },
-    { id: '4', name: 'Ringo Starr', order: 6 },
-    { id: '5', name: 'Pete Best', order: 4 },
-    { id: '6', name: 'Stuart Sutcliffe', order: 3 }
-  ];
-
-  User.destroyAll(() => {
-    beatles.forEach((beatle) => {
-      User.create(beatle, ok);
-    });
-  });
-
-  function ok() {
-    if (++count === beatles.length) {
-      done();
-    }
-  }
-}

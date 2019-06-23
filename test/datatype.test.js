@@ -1,48 +1,53 @@
-const should = require('./init.js');
+/* eslint-disable no-unused-expressions */
+const should = require('should');
+const { getSchema, closeDynaliteServer } = require('./init.js');
 
-describe('datatypes', function() {
-  before(function(done) {
-    db = getSchema();
-    Model = db.define('Model', {
-      str: String,
-      date: String,
-      num: Number,
-      bool: Boolean
-    });
+describe('datatypes', () => {
+  let db;
+  let Model;
 
-    db.adapter.emitter.on('created', function() {
-      done();
-    });
-  });
-
-  after(function(done) {
-    db.adapter.client.deleteTable({ TableName: 'Model' }, function() {
-      done();
-    });
-  });
-
-  it('should keep types when get read data from db', function(done) {
-    const date = new Date();
-    Model.create(
+  before(async () => {
+    db = await getSchema();
+    Model = db.define('Model',
       {
-        str: 'hello',
-        date: date.toISOString(),
-        num: '3',
-        bool: 1
-      },
-      function(err, model) {
+        str: String,
+        date: String,
+        num: Number,
+        bool: Boolean,
+      }, {
+        tableStatus: {
+          timeInterval: 50,
+        },
+      });
+
+    return new Promise((resolve) => {
+      db.adapter.emitter.on('created', resolve);
+    });
+  });
+
+  after((done) => {
+    db.adapter.client.deleteTable({ TableName: 'Model' }, () => {
+      closeDynaliteServer().then(done);
+    });
+  });
+
+  it('should keep types when get read data from db', (done) => {
+    const date = new Date();
+
+    function testAll() {
+      Model.findOne((err, model) => {
         should.not.exist(err);
-        should.exist(model && model.id);
+        should.exist(model);
         model.str.should.be.a.String;
         model.num.should.be.a.Number;
         model.bool.should.be.a.Boolean;
-        id = model.id;
-        testFind(model.id, testAll);
-      }
-    );
+        model.date.should.equal(date.toISOString(), 'Time must match');
+        done();
+      });
+    }
 
     function testFind(id, next) {
-      Model.find(id, function(err, model) {
+      Model.find(id, (err, model) => {
         should.not.exist(err);
         should.exist(model);
         model.str.should.be.a.String;
@@ -53,20 +58,25 @@ describe('datatypes', function() {
       });
     }
 
-    function testAll() {
-      Model.findOne(function(err, model) {
+    Model.create(
+      {
+        str: 'hello',
+        date: date.toISOString(),
+        num: '3',
+        bool: 1,
+      },
+      (err, model) => {
         should.not.exist(err);
-        should.exist(model);
+        should.exist(model && model.id);
         model.str.should.be.a.String;
         model.num.should.be.a.Number;
         model.bool.should.be.a.Boolean;
-        model.date.should.equal(date.toISOString(), 'Time must match');
-        done();
-      });
-    }
+        testFind(model.id, testAll);
+      },
+    );
   });
 
-  it('should convert "false" to false for boolean', function() {
+  it('should convert "false" to false for boolean', () => {
     const model = new Model({ bool: 'false' });
     model.bool.should.equal(false);
   });
