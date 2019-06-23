@@ -1,16 +1,16 @@
 module.exports = require('should');
 
-const Schema = require('jugglingdb').Schema;
+const { Schema } = require('jugglingdb');
 
-global.getSchema = function () {
+global.getSchema = () => {
   const db = new Schema(require('../'), {
     host: 'localhost',
     port: '9800',
     region: 'ap-southeast-1',
     loggers: ['console'],
-    logLevel: 'error',
+    logLevel: 'debug',
   });
-  db.log = function (a) {
+  db.log = (a) => {
     console.log(a);
   };
 
