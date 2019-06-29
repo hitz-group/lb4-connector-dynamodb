@@ -1,64 +1,67 @@
-const should = require('./init.js');
+const should = require('should');
+const { getSchema, closeDynaliteServer } = require('./init.js');
 
-describe('dynamodb', function() {
-  before(function(done) {
-    db = getSchema();
-    User = db.define('User', {
-      id: { type: String, keyType: 'hash' },
-      name: { type: String },
-      email: { type: String },
-      age: { type: Number }
-    });
+describe('dynamodb', () => {
+  let db;
+  let User;
+  let Song;
 
-    Film = db.define('Film', {
-      title: { type: String },
-      year: { type: Number }
-    });
+  before(async () => {
+    db = await getSchema();
+    User = db.define('User',
+      {
+        id: { type: String, keyType: 'hash' },
+        name: { type: String },
+        email: { type: String },
+        age: { type: Number },
+      }, {
+        tableStatus: {
+          timeInterval: 50,
+        },
+      });
 
-    Book = db.define('Book', {
-      title: { type: String },
-      iban: { type: String, keyType: 'hash' }
-    });
+    Song = db.define('Song',
+      {
+        id: { type: String, keyType: 'pk', separator: '--oo--' },
+        singer: { type: String, keyType: 'hash' },
+        title: { type: String, keyType: 'range' },
+      }, {
+        tableStatus: {
+          timeInterval: 50,
+        },
+      });
 
-    Song = db.define('Song', {
-      id: { type: String, keyType: 'pk', separator: '--oo--' },
-      singer: { type: String, keyType: 'hash' },
-      title: { type: String, keyType: 'range' }
-    });
-
-    let modelCreated = 0;
-    db.adapter.emitter.on('created', function() {
-      modelCreated++;
-      if (modelCreated === 4) {
-        done();
-      }
-    });
-  });
-
-  after(function(done) {
-    db.adapter.client.deleteTable({ TableName: 'Film' }, function() {
-      db.adapter.client.deleteTable({ TableName: 'User' }, function() {
-        db.adapter.client.deleteTable({ TableName: 'Book' }, function() {
-          db.adapter.client.deleteTable({ TableName: 'Song' }, function() {
-            done();
-          });
-        });
+    return new Promise((resolve) => {
+      let modelCreated = 0;
+      db.adapter.emitter.on('created', () => {
+        modelCreated += 1;
+        if (modelCreated === 2) {
+          resolve();
+        }
       });
     });
   });
 
-  describe('creating table', function() {
-    it('should create table for User', function(done) {
-      db.adapter.client.describeTable({ TableName: 'User' }, function(err, data) {
-        (data === null).should.be.false;
+  after((done) => {
+    db.adapter.dropTable('User', () => {
+      db.adapter.dropTable('Song', () => {
+        closeDynaliteServer().then(done);
+      });
+    });
+  });
+
+  describe('creating table', () => {
+    it('should create table for User', (done) => {
+      db.adapter.client.describeTable({ TableName: 'User' }, (err, data) => {
+        should.exist(data);
         done();
       });
     });
   });
 
-  describe('if only have hash keys', function() {
-    it('should have hash key', function(done) {
-      db.adapter.client.describeTable({ TableName: 'User' }, function(err, data) {
+  describe('if only have hash keys', () => {
+    it('should have hash key', (done) => {
+      db.adapter.client.describeTable({ TableName: 'User' }, (err, data) => {
         should.not.exist(err);
         data.Table.KeySchema[0].AttributeName.should.eql('id');
         data.Table.KeySchema[0].KeyType.should.eql('HASH');
@@ -66,73 +69,89 @@ describe('dynamodb', function() {
       });
     });
 
-    it('should throw error if uuid is true and attribute name is not id', function(done) {
-      (function() {
+    it('should throw error if uuid is true and attribute name is not id', (done) => {
+      (() => {
         db.define('Model', {
-          attribute1: { type: String, keyType: 'hash', uuid: true }
-        });
-      }.should.throw());
+          attribute1: { type: String, keyType: 'hash', uuid: true },
+        }, {
+            tableStatus: {
+              timeInterval: 50,
+            },
+          });
+      }).should.throw();
       done();
     });
 
-    it('should should fetch based on hash key', function(done) {
-      User.find('1', function(err, user) {
-        should.not.exist(err);
-        should.exist.user;
-        done();
+    it('should should fetch based on hash key', (done) => {
+      User.create({
+        id: '1',
+        name: 'John Lennon',
+        mail: 'john@b3atl3s.co.uk',
+        role: 'lead',
+        order: 2,
+      }, () => {
+        User.find('1', (err, user) => {
+          should.not.exist(err);
+          should.exist(user);
+          done();
+        });
       });
     });
   });
 
-  describe('if model has hash and range keys', function() {
-    it('should throw error id attribute is missing', function(done) {
-      (function() {
+  describe('if model has hash and range keys', () => {
+    it('should throw error id attribute is missing', (done) => {
+      (() => {
         db.define('Model', {
           attribute1: { type: String, keyType: 'hash' },
-          attribute2: { type: Number, keyType: 'range' }
-        });
-      }.should.throw());
+          attribute2: { type: Number, keyType: 'range' },
+        }, {
+            tableStatus: {
+              timeInterval: 50,
+            },
+          });
+      }).should.throw();
       done();
     });
 
-    it('should use separator specified in schema definition', function(done) {
+    it('should use separator specified in schema definition', (done) => {
       const song = new Song({
         singer: 'Foo Fighters',
-        title: 'The Pretender'
+        title: 'The Pretender',
       });
-      Song.create(song, function(err, _song) {
+      Song.create(song, (err, _song) => {
         _song.should.have.property('id', 'Foo Fighters--oo--The Pretender');
         done();
       });
     });
 
-    it('should find objects with id attribute', function(done) {
-      Song.find('Foo Fighters--oo--The Pretender', function(err, fetchedSong) {
+    it('should find objects with id attribute', (done) => {
+      Song.find('Foo Fighters--oo--The Pretender', (err, fetchedSong) => {
         fetchedSong.title.should.eql('The Pretender');
         fetchedSong.singer.should.eql('Foo Fighters');
         done();
       });
     });
 
-    it('should create two items for same hash but different ranges', function(done) {
+    it('should create two items for same hash but different ranges', (done) => {
       const song1 = new Song({
         title: 'The Pretender',
-        singer: 'Foo Fighters'
+        singer: 'Foo Fighters',
       });
 
       const song2 = new Song({
         title: 'All my life',
-        singer: 'Foo Fighters'
+        singer: 'Foo Fighters',
       });
 
-      Song.create(song1, function(err, _song1) {
-        should.not.exist(err);
+      Song.create(song1, (err1, _song1) => {
+        should.not.exist(err1);
         should.exist(_song1);
         _song1.should.have.property('title', 'The Pretender');
         _song1.should.have.property('singer', 'Foo Fighters');
 
-        Song.create(song2, function(err, _song2) {
-          should.not.exist(err);
+        Song.create(song2, (err2, _song2) => {
+          should.not.exist(err2);
           should.exist(_song2);
           _song2.should.have.property('title', 'All my life');
           _song2.should.have.property('singer', 'Foo Fighters');
