@@ -37,6 +37,8 @@ const getSchema = async () => {
     region: 'ap-southeast-1',
     loggers: ['console'],
     logLevel: 'error',
+    accessKeyId: 'none',
+    secretAccessKey: 'none',
   });
 
   db.log = (a) => {

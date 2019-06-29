@@ -1,5 +1,5 @@
 const should = require('should');
-const { getSchema } = require('./init.js');
+const { getSchema, closeDynaliteServer } = require('./init.js');
 
 describe('dynamodb', () => {
   let db;
@@ -43,9 +43,9 @@ describe('dynamodb', () => {
   });
 
   after((done) => {
-    db.adapter.client.deleteTable({ TableName: 'User' }, () => {
-      db.adapter.client.deleteTable({ TableName: 'Song' }, () => {
-        done();
+    db.adapter.dropTable('User', () => {
+      db.adapter.dropTable('Song', () => {
+        closeDynaliteServer().then(done);
       });
     });
   });
@@ -73,7 +73,11 @@ describe('dynamodb', () => {
       (() => {
         db.define('Model', {
           attribute1: { type: String, keyType: 'hash', uuid: true },
-        });
+        }, {
+            tableStatus: {
+              timeInterval: 50,
+            },
+          });
       }).should.throw();
       done();
     });
@@ -101,7 +105,11 @@ describe('dynamodb', () => {
         db.define('Model', {
           attribute1: { type: String, keyType: 'hash' },
           attribute2: { type: Number, keyType: 'range' },
-        });
+        }, {
+            tableStatus: {
+              timeInterval: 50,
+            },
+          });
       }).should.throw();
       done();
     });

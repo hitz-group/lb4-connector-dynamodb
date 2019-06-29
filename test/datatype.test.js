@@ -26,7 +26,7 @@ describe('datatypes', () => {
   });
 
   after((done) => {
-    db.adapter.client.deleteTable({ TableName: 'Model' }, () => {
+    db.adapter.dropTable('Model', () => {
       closeDynaliteServer().then(done);
     });
   });

@@ -26,11 +26,18 @@ describe('relations', () => {
         timeInterval: 50,
       },
     });
-    Chapter = db.define('Chapter', { name: { type: String, index: true, limit: 20 } }, {
-      tableStatus: {
-        timeInterval: 50,
-      },
-    });
+    Chapter = db.define('Chapter',
+      {
+        name: {
+          type: String,
+          index: true,
+          limit: 20,
+        },
+      }, {
+        tableStatus: {
+          timeInterval: 50,
+        },
+      });
     Author = db.define('Author', { name: String }, {
       tableStatus: {
         timeInterval: 50,
@@ -75,7 +82,7 @@ describe('relations', () => {
         return;
       }
 
-      db.adapter.client.deleteTable({ TableName: tables[index] }, deleteTable);
+      db.adapter.dropTable(tables[index], deleteTable);
       index += 1;
     }
 

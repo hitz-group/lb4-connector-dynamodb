@@ -8,40 +8,46 @@ describe('hooks', () => {
   let User;
   let FooModel;
 
-  before(async () => {
-    db = await getSchema();
-    User = db.define('User',
-      {
-        email: { type: String, index: true, limit: 100 },
-        name: String,
-        password: String,
-        state: String,
-      }, {
-        tableStatus: {
-          timeInterval: 50,
-        },
-      });
-
-    FooModel = db.define('FooModel', {}, {
-      tableStatus: {
-        timeInterval: 50,
-      },
-    });
-
-    return new Promise((resolve) => {
+  before(() => {
+    return new Promise(async (resolve) => {
       let modelCreated = 0;
+
+      db = await getSchema();
+
       db.adapter.emitter.on('created', () => {
         modelCreated += 1;
         if (modelCreated === 2) {
           resolve();
         }
       });
+
+      User = db.define('User', {
+        email: {
+          type: String,
+          index: true,
+          limit: 100
+        },
+        name: String,
+        password: String,
+        state: String,
+      }, {
+          tableStatus: {
+            timeInterval: 50,
+          },
+        });
+
+      FooModel = db.define('FooModel', {}, {
+        tableStatus: {
+          timeInterval: 50,
+        },
+      });
+
     });
   });
 
   after((done) => {
-    db.adapter.client.deleteTable({ TableName: 'User' }, () => {
-      db.adapter.client.deleteTable({ TableName: 'FooModel' }, () => {
+    db.adapter.dropTable('User', () => {
+      db.adapter.dropTable('FooModel', () => {
         closeDynaliteServer().then(done);
       });
     });
@@ -80,7 +86,7 @@ describe('hooks', () => {
         }
       };
       User.create({ name: 'Nickolay' }, (err, user) => {
-        user.id.should.be.ok;
+        should.exist(user.id);
         user.name.should.equal('Nickolay Rozental');
         done();
       });
@@ -183,7 +189,8 @@ describe('hooks', () => {
               },
             },
             (err, jb) => {
-              jb.password.should.equal('hash');
+              should.exist(jb.password);
+              should.equal(jb.password, 'hash');
               done();
             },
           );
@@ -376,6 +383,7 @@ describe('hooks', () => {
         d();
       };
       User.create((e, u) => {
+        should.not.exist(e);
         _user = u;
         life = [];
         done();
