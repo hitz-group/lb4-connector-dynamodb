@@ -6,7 +6,7 @@
   "scripts": {
     "test": "env NODE_ENV=test mocha --color test/*.test.js --timeout 2000 --reporter spec",
     "tdd": "env NODE_ENV=test mocha --color -w --recursive",
-    "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
+    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint ."
   },
   "dependencies": {
