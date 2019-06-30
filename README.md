@@ -1,4 +1,4 @@
-# lb4-connector-dynamodb [![Build Status](https://travis-ci.org/sam016/lb4-connector-dynamodb.svg?branch=master)](https://travis-ci.org/sam016/lb4-connector-dynamodb)
+# lb4-connector-dynamodb [![Build Status](https://travis-ci.org/sam016/lb4-connector-dynamodb.svg?branch=master)](https://travis-ci.org/sam016/lb4-connector-dynamodb) [![Coverage Status](https://coveralls.io/repos/github/sam016/lb4-connector-dynamodb/badge.svg)](https://coveralls.io/github/sam016/lb4-connector-dynamodb)
 
 ## Link
 
